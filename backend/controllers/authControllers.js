@@ -47,6 +47,7 @@ exports.getUser = async (req, res) => {
 
     res.json(user); // Return the user details
   } catch (error) {
+    
     res.status(500).json({ error: error.message });
   }
 };
