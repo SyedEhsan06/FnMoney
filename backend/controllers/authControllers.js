@@ -23,6 +23,7 @@ exports.login = async (req, res) => {
     if (!user || !(await user.comparePassword(password))) {
       return res.status(400).json({ error: "Invalid credentials" });
     }
+    
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
     //set cookie
     res.json({ token});
