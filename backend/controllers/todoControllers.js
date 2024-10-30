@@ -15,12 +15,11 @@ const authenticateToken = (req, res, next) => {
 
 // Create a new todo
 const createTodo = async (req, res) => {
-  const { data, isPrivate } = req.body;
+  const { data } = req.body;
 
   try {
     const todo = new Todo({
       data,
-      isPrivate,
       userId: req.user.id,
     });
     await todo.save();
@@ -30,16 +29,14 @@ const createTodo = async (req, res) => {
   }
 };
 
-
-
 // Update an existing todo
 const updateTodo = async (req, res) => {
   const { id } = req.params;
-  const { data, isPrivate, completed } = req.body;
+  const { data, completed } = req.body;
 
   const todo = await Todo.findOneAndUpdate(
     { _id: id, userId: req.user.id },
-    { data, isPrivate, completed },
+    { data, completed },
     { new: true }
   );
 
@@ -47,22 +44,22 @@ const updateTodo = async (req, res) => {
   res.json(todo);
 };
 
-// Delete single todo
+// Delete a single todo
 const deleteTodos = async (req, res) => {
   const { id } = req.params;
 
   const todo = await Todo.findOneAndDelete({ _id: id, userId: req.user.id });
   if (!todo) return res.status(403).json({ message: "Access denied" });
   res.json(todo);
-} 
+};
 
-// Read todos with filtering and search options
+// Read todos with search options
 const readTodos = async (req, res) => {
-  const { isPrivate, search } = req.query;
-  const filter = { isPrivate: isPrivate === 'true' };
+  const { search } = req.query;
+  const filter = { userId: req.user.id };
 
   if (search) {
-    filter.title = { $regex: search, $options: 'i' };
+    filter.data = { $regex: search, $options: 'i' };
   }
 
   try {
